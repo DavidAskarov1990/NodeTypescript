@@ -1,0 +1,1859 @@
+openapi: 3.0.0
+info:
+  title: Просто мир
+  description: Документация api запросов для админки
+  version: 0.0.1
+
+servers:
+  - url: http://194.87.147.5:8100/api/v1
+    description: url хоста на котором развернут backend
+
+paths:
+
+# -----------------------------------------------
+#  USERS
+# -----------------------------------------------
+   /admin/users/auth/:
+     post:
+       tags:
+         - Пользователи
+       summary: Запрос на авторизацию пользователя
+       requestBody:
+       required: true
+       content:
+       application/json:
+          schema:
+            type: object
+            properties:
+              login:
+                type: string
+              password:
+                type: string
+            required:
+              - login
+              - password
+       responses:
+        '200':
+          headers:
+            X-GUID-Key:
+              schema:
+                type: string
+              description: Ключ для доступа к API из внешних сервисов.
+          description: >
+           Авторизация выполнена
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Users'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '5XX':
+          $ref: '#/components/responses/Unexpected'
+
+
+
+
+
+# -----------------------------------------------
+#  REQUEST GET LIST PARTNERS
+# -----------------------------------------------
+
+   /admin/partners/:
+    get:
+      tags:
+        - Партнеры
+      summary: Запрос на получение списка партнеров
+      parameters:
+        - name: X-GUID-Key
+          in: header
+          schema:
+            type: string
+            format: uuid
+          description: >
+            Ключ для доступа к API из внешних сервисов.
+          required: true
+      responses:
+       '200':
+         description: >
+          Получить список партнеров
+         content:
+           application/json:
+             schema:
+              type: 'array'
+              items:
+                 $ref: '#/components/schemas/Partners'
+       '404':
+         $ref: '#/components/responses/NotFound'
+       '400':
+         $ref: '#/components/responses/BadRequest'
+       '401':
+         $ref: '#/components/responses/Unauthorized'
+       '5XX':
+         $ref: '#/components/responses/Unexpected'
+
+# -----------------------------------------------
+#  C R U D  PARTNER BY ID
+# -----------------------------------------------
+    post:
+      tags:
+       - Партнеры
+      summary: Запрос на создание партнера
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                logo:
+                  type: string
+              required:
+                - title
+                - logo
+      responses:
+         '200':
+           description: Партнер был успешно создан
+           content:
+             application/json:
+               schema:
+                 $ref: '#/components/schemas/Partners'
+         '404':
+           $ref: '#/components/responses/NotFound'
+         '400':
+           $ref: '#/components/responses/BadRequest'
+         '401':
+           $ref: '#/components/responses/Unauthorized'
+         '5XX':
+           $ref: '#/components/responses/Unexpected'
+
+   /admin/partners/{partnerId}/:
+      put:
+        tags:
+          - Партнеры
+        summary: Запрос на обнавление партнера по ID
+        parameters:
+          - in: path
+            name: id
+            type: number
+            description: ID партнера.
+            required: true
+        requestBody:
+           required: true
+           content:
+             application/json:
+               schema:
+                 type: object
+                 properties:
+                   title:
+                     type: string
+                   logo:
+                     type: string
+        responses:
+          '200':
+            description: Партнер был успешно обновлен
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Partners'
+          '404':
+            $ref: '#/components/responses/NotFound'
+          '400':
+            $ref: '#/components/responses/BadRequest'
+          '401':
+            $ref: '#/components/responses/Unauthorized'
+          '5XX':
+            $ref: '#/components/responses/Unexpected'
+
+      get:
+        tags:
+          - Партнеры
+        summary: Запрос на получение информации о партнере
+        parameters:
+          - in: path
+            name: id
+            type: number
+            description: ID партнера.
+            required: true
+        responses:
+          '200':
+            description: Информация о партнере получена успешно
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Partners'
+          '404':
+            $ref: '#/components/responses/NotFound'
+          '400':
+            $ref: '#/components/responses/BadRequest'
+          '401':
+            $ref: '#/components/responses/Unauthorized'
+          '5XX':
+            $ref: '#/components/responses/Unexpected'
+
+      delete:
+        tags:
+          - Партнеры
+        summary: Запрос на удаление партнера по ID
+        parameters:
+          - name: partnerId
+            in: path
+            description: ID парнера, который буде удален
+            required: true
+            schema:
+             type: integer
+             format: int64
+
+          - name: X-GUID-Key
+            in: header
+            schema:
+             type: string
+             format: uuid
+            description: Ключ для доступа к API из внешних сервисов.
+            required: true
+        responses:
+          '404':
+            $ref: '#/components/responses/NotFound'
+          '400':
+            $ref: '#/components/responses/BadRequest'
+          '401':
+            $ref: '#/components/responses/Unauthorized'
+          '5XX':
+            $ref: '#/components/responses/Unexpected'
+
+   /admin/partners/{partnerId}/:
+      get:
+        tags:
+         - Партнеры
+        summary: Получить партнера по ID
+        parameters:
+          - name: partnerId
+            in: path
+            schema:
+              type: integer
+              format: int64
+            required: true
+            description: ID партнера
+          - name: X-GUID-Key
+            in: header
+            schema:
+              type: string
+              format: uuid
+            description: >
+              Ключ для доступа к API из внешних сервисов.
+            required: true
+        responses:
+           '200':
+             description: >
+              Получить список партнеров
+             content:
+               application/json:
+                 schema:
+                   $ref: '#/components/schemas/Partners'
+           '404':
+             $ref: '#/components/responses/NotFound'
+           '400':
+             $ref: '#/components/responses/BadRequest'
+           '401':
+             $ref: '#/components/responses/Unauthorized'
+           '5XX':
+             $ref: '#/components/responses/Unexpected'
+
+
+# -------------------------------------------------
+#  CUSTOMER
+# -------------------------------------------------
+   /admin/customer/:
+      get:
+        tags:
+          - Клиенты
+        summary: Запрос списка пользователей
+        parameters:
+         - name: X-GUID-Key
+           in: header
+           schema:
+             type: string
+             format: uuid
+           description: Ключ для доступа к API из внешних сервисов.
+           required: true
+        responses:
+          '200':
+            description: Партнер был успешно создан
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Customers'
+          '404':
+            $ref: '#/components/responses/NotFound'
+          '400':
+            $ref: '#/components/responses/BadRequest'
+          '401':
+            $ref: '#/components/responses/Unauthorized'
+          '5XX':
+            $ref: '#/components/responses/Unexpected'
+
+      post:
+         tags:
+          - Клиенты
+         summary: Запрос на создание клиента
+         parameters:
+           - name: X-GUID-Key
+             in: header
+             schema:
+               type: string
+               format: uuid
+             description: >
+               Ключ для доступа к API из внешних сервисов.
+             required: true
+         requestBody:
+            required: true
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    email:
+                      type: string
+                      format: email
+                    phone:
+                      type: string
+                    address:
+                      type: string
+                    full_name:
+                      type: string
+                    social_accounts:
+                      type: object
+                    messengers_accounts:
+                      type: object
+                    password:
+                      type: string
+                  required:
+                    - email
+                    - phone
+                    - address
+                    - social_accounts
+                    - messengers_accounts
+                    - password
+         responses:
+            '200':
+              description: Партнер был успешно создан
+              content:
+                application/json:
+                  schema:
+                    $ref: '#/components/schemas/Customers'
+            '404':
+              $ref: '#/components/responses/NotFound'
+            '400':
+              $ref: '#/components/responses/BadRequest'
+            '401':
+              $ref: '#/components/responses/Unauthorized'
+            '5XX':
+              $ref: '#/components/responses/Unexpected'
+
+   /admin/customer/{customerId}/:
+      put:
+         tags:
+          - Клиенты
+         summary: Запрос на создание клиента
+         parameters:
+           - name: X-GUID-Key
+             in: header
+             schema:
+               type: string
+               format: uuid
+             description: >
+               Ключ для доступа к API из внешних сервисов.
+             required: true
+         requestBody:
+            required: true
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    email:
+                      type: string
+                      format: email
+                    phone:
+                      type: string
+                    address:
+                      type: string
+                    full_name:
+                      type: string
+                    social_accounts:
+                      type: object
+                    messengers_accounts:
+                      type: object
+                    password:
+                      type: string
+         responses:
+           '200':
+             description: Партнер был успешно обнавлен
+             content:
+               application/json:
+                 schema:
+                   $ref: '#/components/schemas/Customers'
+           '404':
+             $ref: '#/components/responses/NotFound'
+           '400':
+             $ref: '#/components/responses/BadRequest'
+           '401':
+             $ref: '#/components/responses/Unauthorized'
+           '5XX':
+             $ref: '#/components/responses/Unexpected'
+
+      delete:
+        tags:
+            - Клиенты
+        summary: Запрос на создание клиента
+        parameters:
+             - name: X-GUID-Key
+               in: header
+               schema:
+                 type: string
+                 format: uuid
+               description: >
+                 Ключ для доступа к API из внешних сервисов.
+               required: true
+        responses:
+           '200':
+              description: Клиент был успешно удален
+              content:
+                application/json:
+                  schema:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+           '404':
+              $ref: '#/components/responses/NotFound'
+           '400':
+             $ref: '#/components/responses/BadRequest'
+           '401':
+             $ref: '#/components/responses/Unauthorized'
+           '5XX':
+             $ref: '#/components/responses/Unexpected'
+
+
+# -------------------------------------------------
+#  REQUEST SEARCH PRODUCTS BY TERM / all products
+# -------------------------------------------------
+   /admin/products/{productId}/:
+    get:
+      tags:
+        - Товары
+      summary: Запрос на получение информации о товаре
+      description: Запрос на получение товара по ID
+      parameters:
+       - name: productId
+         in: path
+         schema:
+            type: string
+            format: int64
+         required: true
+         description: ID продукта
+       - name: X-GUID-Key
+         in: header
+         schema:
+           type: string
+           format: uuid
+         description: >
+           Ключ для доступа к API из внешних сервисов.
+         required: true
+      responses:
+        '200':
+          description: Поиск товара выполнен успешно
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Items'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '5XX':
+          $ref: '#/components/responses/Unexpected'
+
+    delete:
+       tags:
+        - Товары
+       summary: Запрос на удаление товара
+       description: Запрос на удаление товара по ID
+       parameters:
+        - name: productId
+          in: path
+          schema:
+            type: string
+            format: int64
+          required: true
+          description: ID продукта
+        - name: X-GUID-Key
+          in: header
+          schema:
+           type: string
+           format: uuid
+          description: >
+           Ключ для доступа к API из внешних сервисов.
+          required: true
+       responses:
+          '200':
+            description: Клиент был успешно удален
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+          '404':
+            $ref: '#/components/responses/NotFound'
+          '400':
+            $ref: '#/components/responses/BadRequest'
+          '401':
+            $ref: '#/components/responses/Unauthorized'
+          '5XX':
+            $ref: '#/components/responses/Unexpected'
+
+# -----------------------------------------------
+#  REQUEST GET REMNANTS PRODUCTS BY ID
+# -----------------------------------------------
+
+   /admin/remnants/products/{productId}/:
+     get:
+       tags:
+         - Товары
+       summary: Запрос на получение остатков товара
+       description: >
+        Запрос на получение остатков товара партнера по ID продукта
+       parameters:
+        - name: X-GUID-Key
+          in: header
+          schema:
+            type: string
+            format: uuid
+          description: >
+            Ключ для доступа к API из внешних сервисов.
+          required: true
+        - name: productId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+          description: ID товара
+        - name: partnerId
+          in: query
+          description: >
+            Массив ID партнеров, по которым будет выполнен поиск продукта. В случае если значение равно null поиск будет выполнен по всем партнерам
+          schema:
+            type: array
+       responses:
+         '200':
+           description: >
+            Поиск отстатка товара выполнен успешно
+           content:
+             application/json:
+               schema:
+                type: 'array'
+                items:
+                  $ref: '#/components/schemas/Remnants'
+         '404':
+           $ref: '#/components/responses/NotFound'
+         '400':
+           $ref: '#/components/responses/BadRequest'
+         '401':
+           $ref: '#/components/responses/Unauthorized'
+         '5XX':
+           $ref: '#/components/responses/Unexpected'
+
+# -----------------------------------------------
+#  STORAGE
+# -----------------------------------------------
+   /admin/storages/:
+      get:
+        tags:
+          - Торговые точки
+        summary: Запрос на получение списка торговых точек
+        description: Запрос на получение списка торговых точек
+        parameters:
+          - name: X-GUID-Key
+            in: header
+            schema:
+              type: string
+              format: uuid
+            description: >
+              Ключ для доступа к API из внешних сервисов.
+            required: true
+        responses:
+           '200':
+             description: >
+              Поиск отстатка товара выполнен успешно
+             content:
+               application/json:
+                 schema:
+                  type: 'array'
+                  items:
+                    $ref: '#/components/schemas/Storage'
+           '404':
+             $ref: '#/components/responses/NotFound'
+           '400':
+             $ref: '#/components/responses/BadRequest'
+           '401':
+             $ref: '#/components/responses/Unauthorized'
+           '5XX':
+             $ref: '#/components/responses/Unexpected'
+
+   /admin/storages/{storageId}/:
+      get:
+        tags:
+          - Торговые точки
+        summary: Запрос на получение информации о торговой точке
+        description: Запрос на получение информации о торговой точке по ID
+        parameters:
+          - name: storageId
+            in: path
+            required: true
+            schema:
+              type: integer
+              format: int64
+            description: ID торговой точки
+          - name: X-GUID-Key
+            in: header
+            schema:
+              type: string
+              format: uuid
+            description: >
+              Ключ для доступа к API из внешних сервисов.
+            required: true
+        responses:
+           '200':
+             description: >
+              Запрос на получение информации о торговой точке выполнен успешно
+             content:
+               application/json:
+                 schema:
+                    $ref: '#/components/schemas/Storage'
+           '404':
+             $ref: '#/components/responses/NotFound'
+           '400':
+             $ref: '#/components/responses/BadRequest'
+           '401':
+             $ref: '#/components/responses/Unauthorized'
+           '5XX':
+             $ref: '#/components/responses/Unexpected'
+
+# -----------------------------------------------
+#  ERM SYSTEM
+# -----------------------------------------------
+   /admin/erm-connections/:
+    get:
+      tags:
+        - Подключенные ERM/CRM
+      summary: Запрос на получение списка поддерживаемых ERP-систем
+      description: Запрос на получение списка поддерживаемых ERP-систем
+      parameters:
+        - name: X-GUID-Key
+          in: header
+          schema:
+            type: string
+            format: uuid
+          description: >
+            Ключ для доступа к API из внешних сервисов.
+          required: true
+      responses:
+         '200':
+           description: >
+            Запрос на получение информации о поддерживаемых ERP-систем выполнен успешно
+           content:
+             application/json:
+               schema:
+                  items:
+                    $ref: '#/components/schemas/ERM'
+         '404':
+           $ref: '#/components/responses/NotFound'
+         '400':
+           $ref: '#/components/responses/BadRequest'
+         '401':
+           $ref: '#/components/responses/Unauthorized'
+         '5XX':
+           $ref: '#/components/responses/Unexpected'
+
+    post:
+       tags:
+          - Подключенные ERM/CRM
+       summary: Запрос создание ERP-системы
+       description: Запрос создание ERP-системы
+       parameters:
+         - name: X-GUID-Key
+           in: header
+           schema:
+             type: string
+             format: uuid
+           description: >
+             Ключ для доступа к API из внешних сервисов.
+           required: true
+       requestBody:
+         required: true
+         content:
+           application/json:
+             schema:
+               type: object
+               properties:
+                 fk_system_types_id:
+                   type: integer
+                 fk_schedules_id:
+                   type: integer
+                 title:
+                   type: string
+                   maxLength: 150
+                 secret:
+                   type: string
+                 connection_info:
+                   type: object
+               required:
+                  - fk_system_types_id
+                  - fk_schedules_id
+                  - title
+                  - secret
+                  - connection_info
+       responses:
+         '200':
+           description: >
+            Запрос на получение информации о поддерживаемых ERP-систем выполнен успешно
+           content:
+             application/json:
+               schema:
+                  $ref: '#/components/schemas/ERM'
+         '404':
+           $ref: '#/components/responses/NotFound'
+         '400':
+           $ref: '#/components/responses/BadRequest'
+         '401':
+           $ref: '#/components/responses/Unauthorized'
+         '5XX':
+           $ref: '#/components/responses/Unexpected'
+
+
+
+   /admin/erm-connections/{ermId}/:
+      get:
+        tags:
+          - Подключенные ERM/CRM
+        summary: Запрос на получение информации о подключенной ERP-системы
+        description: Запрос на получение информации ERP-системы по ID
+        parameters:
+          - name: ermId
+            in: path
+            required: true
+            schema:
+              type: integer
+              format: int64
+            description: ID поключенной ERM системы
+          - name: X-GUID-Key
+            in: header
+            schema:
+              type: string
+              format: uuid
+            description: >
+              Ключ для доступа к API из внешних сервисов.
+            required: true
+        responses:
+           '200':
+             description: >
+              Запрос на получение информации о поддерживаемых ERP-систем выполнен успешно
+             content:
+               application/json:
+                 schema:
+                  $ref: '#/components/schemas/ERM'
+           '404':
+             $ref: '#/components/responses/NotFound'
+           '400':
+             $ref: '#/components/responses/BadRequest'
+           '401':
+             $ref: '#/components/responses/Unauthorized'
+           '5XX':
+             $ref: '#/components/responses/Unexpected'
+      put:
+        tags:
+          - Подключенные ERM/CRM
+        summary: Запрос на обновление подключенной ERP-системы
+        description: Запрос на обновление ERP-системы по ID
+        parameters:
+          - name: ermId
+            in: path
+            required: true
+            schema:
+              type: integer
+              format: int64
+            description: ID поключенной ERM системы
+          - name: X-GUID-Key
+            in: header
+            schema:
+              type: string
+              format: uuid
+            description: >
+              Ключ для доступа к API из внешних сервисов.
+            required: true
+        requestBody:
+          required: true
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  fk_system_types_id:
+                    type: integer
+                  fk_schedules_id:
+                    type: integer
+                  title:
+                    type: string
+                    maxLength: 150
+                  secret:
+                    type: string
+                  connection_info:
+                    type: object
+        responses:
+           '200':
+             description: >
+              Запрос на обновление ERP-системы выполнен успешно
+             content:
+               application/json:
+                 schema:
+                  $ref: '#/components/schemas/ERM'
+           '404':
+             $ref: '#/components/responses/NotFound'
+           '400':
+             $ref: '#/components/responses/BadRequest'
+           '401':
+             $ref: '#/components/responses/Unauthorized'
+           '5XX':
+             $ref: '#/components/responses/Unexpected'
+
+      delete:
+        tags:
+          - Подключенные ERM/CRM
+        summary: Запрос на удаление поключенной ERP-системы
+        description: Запрос на удаление ERP-системы по ID
+        parameters:
+          - name: ermId
+            in: path
+            required: true
+            schema:
+              type: integer
+              format: int64
+            description: ID поключенной ERM системы
+          - name: X-GUID-Key
+            in: header
+            schema:
+              type: string
+              format: uuid
+            description: >
+              Ключ для доступа к API из внешних сервисов.
+            required: true
+        responses:
+          '200':
+            description: Клиент был успешно удален
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+          '404':
+            $ref: '#/components/responses/NotFound'
+          '400':
+            $ref: '#/components/responses/BadRequest'
+          '401':
+            $ref: '#/components/responses/Unauthorized'
+          '5XX':
+            $ref: '#/components/responses/Unexpected'
+
+   /admin/erm-connections/{ermId}/unloading:
+      get:
+        tags:
+          - Подключенные ERM/CRM
+        summary: Запрос на прямую выгрузку данных из ERP-системы
+        description: Запрос на прямую выгрузку данных из ERP-системы по ID
+        parameters:
+          - name: ermId
+            in: path
+            required: true
+            schema:
+              type: integer
+              format: int64
+            description: ID поключенной ERM системы
+          - name: X-GUID-Key
+            in: header
+            schema:
+              type: string
+              format: uuid
+            description: >
+              Ключ для доступа к API из внешних сервисов.
+            required: true
+        responses:
+          '200':
+            description: Выгрузка данных из ERP-системы выполнена успешно
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    message:
+                      type: string
+          '404':
+            $ref: '#/components/responses/NotFound'
+          '400':
+            $ref: '#/components/responses/BadRequest'
+          '401':
+            $ref: '#/components/responses/Unauthorized'
+          '5XX':
+            $ref: '#/components/responses/Unexpected'
+
+
+   /admin/erm-systems/:
+      get:
+        tags:
+          - Поддерживаемые ERM/CRM
+        summary: Запрос на получение ERP-систем
+        description: Запрос списка поддерживаемых ERP-систем
+        parameters:
+          - name: X-GUID-Key
+            in: header
+            schema:
+              type: string
+              format: uuid
+            description: >
+              Ключ для доступа к API из внешних сервисов.
+            required: true
+        responses:
+           '200':
+             description: >
+              Запрос на получение информации ERP-систем выполнен успешно
+             content:
+               application/json:
+                 schema:
+                  items:
+                    $ref: '#/components/schemas/SystemTypes'
+           '404':
+             $ref: '#/components/responses/NotFound'
+           '400':
+             $ref: '#/components/responses/BadRequest'
+           '401':
+             $ref: '#/components/responses/Unauthorized'
+           '5XX':
+             $ref: '#/components/responses/Unexpected'
+
+   /admin/erm-systems/{ermId}:
+      get:
+        tags:
+         - Поддерживаемые ERM/CRM
+        summary: Запрос на получение ERP-системы по ID
+        description: Запрос списка поддерживаемых ERP-систем по ID
+        parameters:
+          - name: X-GUID-Key
+            in: header
+            schema:
+              type: string
+              format: uuid
+            description: >
+              Ключ для доступа к API из внешних сервисов.
+            required: true
+          - name: ermId
+            in: path
+            required: true
+            schema:
+              type: integer
+              format: int64
+            description: ID поддерживаемой ERM системы
+        responses:
+           '200':
+             description: >
+              Запрос на получение информации ERP-системы выполнен успешно
+             content:
+               application/json:
+                 schema:
+                  $ref: '#/components/schemas/SystemTypes'
+           '404':
+             $ref: '#/components/responses/NotFound'
+           '400':
+             $ref: '#/components/responses/BadRequest'
+           '401':
+             $ref: '#/components/responses/Unauthorized'
+           '5XX':
+             $ref: '#/components/responses/Unexpected'
+
+      post:
+        tags:
+          - Поддерживаемые ERM/CRM
+        summary: Запрос на создание ERP-системы
+        description: Запрос на создание ERP-системы
+        parameters:
+          - name: X-GUID-Key
+            in: header
+            schema:
+              type: string
+              format: uuid
+            description: >
+              Ключ для доступа к API из внешних сервисов.
+            required: true
+        requestBody:
+           required: true
+           content:
+             application/json:
+               schema:
+                 type: object
+                 properties:
+                   title:
+                     type: string
+                   connection_fields:
+                     type: json
+                 required:
+                    - title
+                    - connection_fields
+        responses:
+           '200':
+             description: >
+              Создание ERP-системы выполнено успешно
+             content:
+               application/json:
+                 schema:
+                  $ref: '#/components/schemas/SystemTypes'
+           '404':
+             $ref: '#/components/responses/NotFound'
+           '400':
+             $ref: '#/components/responses/BadRequest'
+           '401':
+             $ref: '#/components/responses/Unauthorized'
+           '5XX':
+             $ref: '#/components/responses/Unexpected'
+
+      put:
+        tags:
+          - Поддерживаемые ERM/CRM
+        summary: Запрос на обновление ERP-системы по ID
+        description: Запрос на обновление ERP-системы по ID
+        parameters:
+          - name: X-GUID-Key
+            in: header
+            schema:
+              type: string
+              format: uuid
+            description: >
+              Ключ для доступа к API из внешних сервисов.
+            required: true
+          - name: ermId
+            in: path
+            required: true
+            schema:
+              type: integer
+              format: int64
+            description: ID поддерживаемой ERM системы
+        requestBody:
+           required: true
+           content:
+             application/json:
+               schema:
+                 type: object
+                 properties:
+                   title:
+                     type: string
+                   connection_fields:
+                     type: json
+        responses:
+           '200':
+             description: >
+              Создание ERP-системы выполнено успешно
+             content:
+               application/json:
+                 schema:
+                  $ref: '#/components/schemas/SystemTypes'
+           '404':
+             $ref: '#/components/responses/NotFound'
+           '400':
+             $ref: '#/components/responses/BadRequest'
+           '401':
+             $ref: '#/components/responses/Unauthorized'
+           '5XX':
+             $ref: '#/components/responses/Unexpected'
+
+      delete:
+        tags:
+          - Поддерживаемые ERM/CRM
+        summary: Запрос на удаление ERP-системы по ID
+        description: Запрос на удаление ERP-системы по ID
+        parameters:
+          - name: ermId
+            in: path
+            required: true
+            schema:
+              type: integer
+              format: int64
+            description: ID поддерживаемые ERM системы
+          - name: X-GUID-Key
+            in: header
+            schema:
+              type: string
+              format: uuid
+            description: >
+              Ключ для доступа к API из внешних сервисов.
+            required: true
+        responses:
+          '200':
+            description: ERM система была успешно удалена
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+          '404':
+            $ref: '#/components/responses/NotFound'
+          '400':
+            $ref: '#/components/responses/BadRequest'
+          '401':
+            $ref: '#/components/responses/Unauthorized'
+          '5XX':
+            $ref: '#/components/responses/Unexpected'
+
+   /admin/erm-schedules/:
+      get:
+         tags:
+            - Расписание выгрузки ERM/CRM
+         summary: Запрос на получение списка расписании выгрузки ERP-системы
+         description: Запрос на получение списка расписании выгрузки ERP-системы
+         parameters:
+           - name: X-GUID-Key
+             in: header
+             schema:
+               type: string
+               format: uuid
+             description: >
+               Ключ для доступа к API из внешних сервисов.
+             required: true
+         responses:
+            '200':
+              description: >
+               Получен список расписания выгрузки ERP-систем
+              content:
+                application/json:
+                  schema:
+                    items:
+                      $ref: '#/components/schemas/Schedules'
+            '404':
+              $ref: '#/components/responses/NotFound'
+            '400':
+              $ref: '#/components/responses/BadRequest'
+            '401':
+              $ref: '#/components/responses/Unauthorized'
+            '5XX':
+              $ref: '#/components/responses/Unexpected'
+      post:
+          tags:
+            - Расписание выгрузки ERM/CRM
+          summary: Запрос на создание расписания выгрузки ERP-системы
+          description: Запрос на создание расписания выгрузки ERP-системы
+          parameters:
+             - name: ermId
+               in: path
+               required: true
+               schema:
+                 type: integer
+                 format: int64
+               description: ID графика выгрузки ERM системы
+             - name: X-GUID-Key
+               in: header
+               schema:
+                 type: string
+                 format: uuid
+               description: >
+                 Ключ для доступа к API из внешних сервисов.
+               required: true
+          requestBody:
+             required: true
+             content:
+               application/json:
+                 schema:
+                   type: object
+                   properties:
+                     cron_string:
+                       type: string
+                     start:
+                       type: string
+                       format: date
+                     end:
+                       type: string
+                       format: date
+                   required:
+                      - cron_string
+                      - start
+                      - end
+          responses:
+              '200':
+                description: >
+                 Создано расписание выгрузки ERP-системы
+                content:
+                  application/json:
+                    schema:
+                        $ref: '#/components/schemas/Schedules'
+              '404':
+                $ref: '#/components/responses/NotFound'
+              '400':
+                $ref: '#/components/responses/BadRequest'
+              '401':
+                $ref: '#/components/responses/Unauthorized'
+              '5XX':
+                $ref: '#/components/responses/Unexpected'
+
+   /admin/erm-schedules/{ermId}:
+      get:
+        tags:
+          - Расписание выгрузки ERM/CRM
+        summary: Запрос на получении расписания выгрузки ERP-системы
+        description: Запрос на получении расписания выгрузки ERP-системы
+        parameters:
+           - name: ermId
+             in: path
+             required: true
+             schema:
+               type: integer
+               format: int64
+             description: ID графика выгрузки ERM системы
+           - name: X-GUID-Key
+             in: header
+             schema:
+               type: string
+               format: uuid
+             description: >
+               Ключ для доступа к API из внешних сервисов.
+             required: true
+        responses:
+            '200':
+              description: >
+               Получено расписание выгрузки ERP-системы
+              content:
+                application/json:
+                  schema:
+                    $ref: '#/components/schemas/Schedules'
+            '404':
+              $ref: '#/components/responses/NotFound'
+            '400':
+              $ref: '#/components/responses/BadRequest'
+            '401':
+              $ref: '#/components/responses/Unauthorized'
+            '5XX':
+              $ref: '#/components/responses/Unexpected'
+      put:
+        tags:
+          - Расписание выгрузки ERM/CRM
+        summary: Запрос на обновление расписания выгрузки ERP-системы
+        description: Запрос на обновление расписания выгрузки ERP-системы
+        parameters:
+           - name: ermId
+             in: path
+             required: true
+             schema:
+               type: integer
+               format: int64
+             description: ID графика выгрузки ERM системы
+           - name: X-GUID-Key
+             in: header
+             schema:
+               type: string
+               format: uuid
+             description: >
+               Ключ для доступа к API из внешних сервисов.
+             required: true
+        requestBody:
+          required: true
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  cron_string:
+                    type: string
+                  start:
+                    type: string
+                    format: date
+                  end:
+                    type: string
+                    format: date
+        responses:
+          '200':
+            description: >
+             Обнавлено расписание выгрузки ERP-системы
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Schedules'
+          '404':
+            $ref: '#/components/responses/NotFound'
+          '400':
+            $ref: '#/components/responses/BadRequest'
+          '401':
+            $ref: '#/components/responses/Unauthorized'
+          '5XX':
+            $ref: '#/components/responses/Unexpected'
+
+      delete:
+        tags:
+          - Расписание выгрузки ERM/CRM
+        summary: Запрос на удаление расписания выгрузки ERP-системы
+        description: Запрос на удаление расписания выгрузки ERP-системы
+        parameters:
+           - name: ermId
+             in: path
+             required: true
+             schema:
+               type: integer
+               format: int64
+             description: ID графика выгрузки ERM системы
+           - name: X-GUID-Key
+             in: header
+             schema:
+               type: string
+               format: uuid
+             description: >
+               Ключ для доступа к API из внешних сервисов.
+             required: true
+        responses:
+          '200':
+            description: график ERM системы был успешно удален
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+          '404':
+            $ref: '#/components/responses/NotFound'
+          '400':
+            $ref: '#/components/responses/BadRequest'
+          '401':
+            $ref: '#/components/responses/Unauthorized'
+          '5XX':
+            $ref: '#/components/responses/Unexpected'
+
+# -----------------------------------------------
+#  ORDERS
+# -----------------------------------------------
+   /admin/orders/:
+    get:
+      tags:
+        - Чеки
+      summary: Запрос на получение списка чеков
+      description: Запрос на удаление ERP-системы по ID
+      parameters:
+        - name: X-GUID-Key
+          in: header
+          schema:
+            type: string
+            format: uuid
+          description: >
+            Ключ для доступа к API из внешних сервисов.
+          required: true
+      responses:
+        '200':
+          description: Запрос на получение списка чеков был выполнен успешно
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/Orders'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '5XX':
+          $ref: '#/components/responses/Unexpected'
+
+   /admin/orders/{orderId}/:
+      get:
+        tags:
+          - Чеки
+        summary: Запрос на получение информации чека
+        description: Запрос на получение информации чека по ID
+        parameters:
+          - name: orderId
+            in: path
+            required: true
+            schema:
+              type: integer
+              format: int64
+            description: ID чека
+          - name: X-GUID-Key
+            in: header
+            schema:
+              type: string
+              format: uuid
+            description: >
+              Ключ для доступа к API из внешних сервисов.
+            required: true
+        responses:
+          '200':
+            description: Запрос на получение информации о чеке было выполнено успешно
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/OrdersContent'
+          '404':
+            $ref: '#/components/responses/NotFound'
+          '400':
+            $ref: '#/components/responses/BadRequest'
+          '401':
+            $ref: '#/components/responses/Unauthorized'
+          '5XX':
+            $ref: '#/components/responses/Unexpected'
+
+      delete:
+        tags:
+            - Чеки
+        summary: Запрос на получение информации чека
+        description: Запрос на получение информации чека по ID
+        parameters:
+          - name: orderId
+            in: path
+            required: true
+            schema:
+              type: integer
+              format: int64
+            description: ID чека
+          - name: X-GUID-Key
+            in: header
+            schema:
+              type: string
+              format: uuid
+            description: >
+              Ключ для доступа к API из внешних сервисов.
+            required: true
+        responses:
+          '200':
+            description: Запрос на получение удаление чека был выполнен успешно
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+          '404':
+            $ref: '#/components/responses/NotFound'
+          '400':
+            $ref: '#/components/responses/BadRequest'
+          '401':
+            $ref: '#/components/responses/Unauthorized'
+          '5XX':
+            $ref: '#/components/responses/Unexpected'
+
+
+
+# -----------------------------------------------
+# -----------------------------------------------
+# -----------------------------------------------
+
+#           COMPONENTS & SCHEMAS
+
+# -----------------------------------------------
+# -----------------------------------------------
+# -----------------------------------------------
+
+components:
+  responses:
+    NotFound:
+      description: Указанный ресурс не найден
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Unauthorized:
+      description: Не авторизованный
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Unexpected:
+      description: Ошибка сервера
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    BadRequest:
+      description: Проверьте запрос отправленный серверу
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Customers:
+      content:
+        application/json:
+          schema:
+             $ref: '#/components/schemas/Error'
+  schemas:
+    Items:
+      type: object
+      description: Модель. Описания товара
+      properties:
+        id:
+          type: integer
+        title:
+          type: string
+        fk_measurement_units_id:
+          type: integer
+        fk_partner_id:
+          type: integer
+        article:
+          type: integer
+        short_title:
+          type: string
+        barcode:
+          type: string
+        description:
+          type: string
+        price_by_unit:
+          type: number
+          format: double
+        photo:
+          type: string
+        create_at:
+          type: string
+          format: date
+        update_at:
+          type: string
+          format: date
+      required:
+        - id
+        - title
+        - fk_measurement_units_id
+        - article
+        - short_title
+        - barcode
+        - description
+        - price_by_unit
+        - fk_partner_id
+        - create_at
+        - update_at
+
+    Storage:
+      type: object
+      description: Модель. Место хранения (Торговая точка)
+      properties:
+        id:
+          type: integer
+        title:
+          type: string
+        address:
+          type: string
+        fk_storages_types_id:
+          type: integer
+        fk_partner_id:
+          type: number
+          format: int64
+        create_at:
+          type: string
+          format: date
+        update_at:
+          type: string
+          format: date
+      required:
+        - id
+        - title
+        - address
+        - fk_storages_types_id
+        - fk_partner_id
+        - create_at
+        - create_at
+        - update_at
+
+    Remnants:
+      type: object
+      description: Модель. Отсатки товаров
+      properties:
+        id:
+          type: integer
+        fk_items_id:
+          type: integer
+        quantity:
+          type: integer
+        fk_systems_connections_id:
+          type: integer
+        fk_storages_id:
+          type: integer
+        fk_partner_id:
+          type: number
+          format: int64
+        create_at:
+          type: string
+          format: date
+        update_at:
+          type: string
+          format: date
+      required:
+        - id
+        - fk_items_id
+        - quantity
+        - fk_storages_types_id
+        - fk__systems_connections_id
+        - fk_storages_id
+        - fk_partner_id
+        - create_at
+        - update_at
+
+    Partners:
+      type: object
+      description: Модель. Партнеры
+      properties:
+        id:
+          type: integer
+        title:
+          type: string
+        logo:
+          type: string
+        create_at:
+          type: string
+          format: date
+        update_at:
+          type: string
+          format: date
+      required:
+        - id
+        - title
+        - logo
+        - create_at
+        - update_at
+
+    Customers:
+      type: object
+      description: Модель. Клиенты
+      properties:
+        id:
+          type: integer
+        email:
+          type: string
+          format: email
+        phone:
+          type: string
+        address:
+          type: string
+        full_name:
+          type: string
+        social_accounts:
+          type: json
+        messengers_accounts:
+          type: json
+        password:
+          type: string
+        create_at:
+          type: string
+          format: date
+        update_at:
+          type: string
+          format: date
+      required:
+        - id
+        - email
+        - phone
+        - address
+        - full_name
+        - social_accounts
+        - messengers_accounts
+        - password
+        - create_at
+        - update_at
+
+    ERM:
+      type: object
+      description: Модель. ERM/CRM настроенных систем
+      properties:
+        id:
+          type: integer
+        fk_system_types_id:
+          type: integer
+        fk_schedules_id:
+          type: integer
+        title:
+          type: string
+          maxLength: 150
+        secret:
+          type: string
+        fk_partner_id:
+          type: number
+          format: int64
+        connection_info:
+          type: object
+        create_at:
+          type: string
+          format: date
+        update_at:
+          type: string
+          format: date
+
+    Orders:
+      type: object
+      description: Модель. Чеки
+      properties:
+        id:
+          type: integer
+        data:
+          type: string
+          format: date
+        full_name:
+          type: string
+        cost:
+          type: integer
+        fk_storages_id:
+          type: integer
+        fk_partner_id:
+          type: number
+          format: int64
+        discount:
+          type: number
+          format: double
+        create_at:
+          type: string
+          format: date
+        update_at:
+          type: string
+          format: date
+
+    OrdersContent:
+      type: object
+      description: Модель. Информация о товарах и чеках
+      properties:
+        id:
+          type: number
+          format: int64
+        fk_items_id:
+          type: integer
+        title:
+          type: string
+        quantity:
+          type: string
+        fk_orders_id:
+          type: number
+          format: int64
+        fk_partner_id:
+          type: number
+          format: int64
+        cost:
+          type: number
+          format: double
+        create_at:
+          type: string
+          format: date
+        update_at:
+          type: string
+          format: date
+
+    SystemTypes:
+      type: object
+      description: Модель. Справочник поддерживаемых CPM/ERM - систем
+      properties:
+        id:
+          type: number
+          format: int64
+        title:
+          type: string
+        connection_fields:
+          type: object
+        create_at:
+          type: string
+          format: date
+        update_at:
+          type: string
+          format: date
+
+    Schedules:
+      type: object
+      description: Модель. Расписание обновленных данных, для различных соединений
+      properties:
+        id:
+          type: number
+          format: int64
+        crong_string:
+          type: string
+        start:
+          type: string
+          format: date
+        fk_partner_id:
+          type: integer
+        end:
+          type: string
+          format: date
+        create_at:
+          type: string
+          format: date
+        update_at:
+          type: string
+          format: date
+
+    Users:
+      type: object
+      description: Модель. Пользователи системы
+      properties:
+        id:
+          type: number
+          format: int64
+        fk_roles_id:
+          type: number
+          format: int64
+        username:
+          type: string
+        phone:
+          type: string
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+        fk_partners_id:
+          type: number
+          format: int64
+        code:
+          type: string
+        is_block:
+          type: boolean
+        key:
+          type: string
+        create_at:
+          type: string
+          format: date
+        update_at:
+          type: string
+          format: date
+      required:
+        - id
+        - fk_roles_id
+        - username
+        - phone
+        - email
+        - password
+        - fk_partners_id
+        - code
+        - is_block
+        - key
+        - create_at
+        - update_at
+
+
+    Error:
+      type: object
+      properties:
+        code:
+          type: string
+        message:
+          type: string
+      required:
+        - code
+        - message
